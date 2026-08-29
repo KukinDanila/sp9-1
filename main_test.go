@@ -1,18 +1,27 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
 
 func TestGenerateRandomElements(t *testing.T) {
-	data := generateRandomElements(1000)
-
-	if len(data) != 1000 {
-		t.Errorf("ожидалась длина 1000, получена %d", len(data))
+	tests := []struct {
+		name string
+		size int
+		want int
+	}{
+		{"нулевой размер", 0, 0},
+		{"отрицательный размер", -5, 0},
+		{"положительный размер", 10, 10},
 	}
 
-	for _, value := range data {
-		if value < 0 || value >= 100000000 {
-			t.Errorf("значение %d выходит за допустимый диапазон", value)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := generateRandomElements(tt.size)
+			require.Equal(t, tt.want, len(got))
+		})
 	}
 }
 
@@ -30,40 +39,17 @@ func TestMaximum(t *testing.T) {
 		data []int
 		want int
 	}{
-		{
-			name: "обычные числа",
-			data: []int{1, 5, 3, 10, 7},
-			want: 10,
-		},
-		{
-			name: "отрицательные числа",
-			data: []int{-10, -5, -20, -3},
-			want: -3,
-		},
-		{
-			name: "один элемент",
-			data: []int{42},
-			want: 42,
-		},
-		{
-			name: "одинаковые элементы",
-			data: []int{5, 5, 5, 5},
-			want: 5,
-		},
-		{
-			name: "пустой слайс",
-			data: []int{},
-			want: 0,
-		},
+		{"пустой слайс", []int{}, 0},
+		{"один элемент", []int{5}, 5},
+		{"максимум в начале", []int{9, 1, 2}, 9},
+		{"максимум в конце", []int{1, 2, 9}, 9},
+		{"максимум в середине", []int{1, 9, 2}, 9},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := maximum(tt.data)
-
-			if got != tt.want {
-				t.Errorf("ожидалось %d, получено %d", tt.want, got)
-			}
+			require.Equal(t, tt.want, got)
 		})
 	}
 }
